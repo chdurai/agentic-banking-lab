@@ -1,0 +1,33 @@
+# Azure profile: run with --spring.profiles.active=azure
+# Uses Azure OpenAI (AI Foundry) deployments instead of NVIDIA NIM.
+spring:
+  ai:
+    model:
+      chat: azure-openai
+    azure:
+      openai:
+        endpoint: ${AZURE_OPENAI_ENDPOINT}
+        api-key: ${AZURE_OPENAI_API_KEY}
+        chat:
+          options:
+            deployment-name: ${AZURE_OPENAI_DEPLOYMENT:gpt-4o}
+            temperature: 0.2
+
+# Map agent roles to Azure deployment names
+platform:
+  llm:
+    provider: azure-openai
+
+agents:
+  models:
+    planner: gpt-4o
+    intake: gpt-4o-mini
+    kyc: gpt-4o
+    credit-risk: gpt-4o
+    compliance: gpt-4o
+    decision: gpt-4o
+    critic: gpt-4o
+    incident-triage: gpt-4o-mini
+    incident-diagnosis: gpt-4o
+    incident-remediation: gpt-4o
+  fallback-model: gpt-4o

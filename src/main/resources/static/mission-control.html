@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#070b14">
+  <meta name="description" content="Real-time multi-agent observability — live agent activity, agent-to-agent collaboration, and flow telemetry">
+  <title>Mission Control — Northstar Agentic Banking</title>
+  <link rel="stylesheet" href="/mission-control.css">
+</head>
+<body>
+  <header class="mc-topbar">
+    <div class="mc-brand">
+      <span class="mc-brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 36 36"><path d="M18 2.5 21.9 14l11.6 4-11.6 3.9L18 33.5 14.1 22 2.5 18l11.6-4L18 2.5Z"/><circle cx="18" cy="18" r="3.1"/></svg>
+      </span>
+      <div class="mc-brand-copy">
+        <strong>MISSION CONTROL</strong>
+        <small>multi-agent live observability</small>
+      </div>
+    </div>
+
+    <div class="mc-stats" role="status" aria-live="polite">
+      <div class="mc-stat"><span class="mc-stat-value" id="stat-active">0</span><span class="mc-stat-label">agents active</span></div>
+      <div class="mc-stat"><span class="mc-stat-value" id="stat-rate">0</span><span class="mc-stat-label">events / min</span></div>
+      <div class="mc-stat"><span class="mc-stat-value" id="stat-latency">—</span><span class="mc-stat-label">avg latency</span></div>
+      <div class="mc-stat"><span class="mc-stat-value" id="stat-a2a">0</span><span class="mc-stat-label">A2A messages</span></div>
+      <div class="mc-stat"><span class="mc-stat-value" id="stat-llm">0</span><span class="mc-stat-label">LLM calls</span></div>
+      <div class="mc-stat"><span class="mc-stat-value" id="stat-cases">0</span><span class="mc-stat-label">cases seen</span></div>
+    </div>
+
+    <div class="mc-actions">
+      <button class="mc-button mc-button-primary" id="launch-demo" title="Run a synthetic loan application through the full agent pipeline">
+        <span class="mc-button-pulse" aria-hidden="true"></span>Launch demo scenario
+      </button>
+      <a class="mc-button" href="/" title="Back to the operations workbench">Workbench&nbsp;↗</a>
+      <div class="mc-connection" id="connection">
+        <span class="mc-connection-dot" id="connection-dot"></span>
+        <span id="connection-label">connecting</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="mc-grid">
+    <section class="mc-panel" id="investigation-panel" aria-label="Synthetic investigation laboratory" hidden>
+      <div class="mc-panel-head">
+        <div><h2>Evidence investigation laboratory</h2>
+          <p id="showcase-mode">SCRIPTED · SYNTHETIC ONLY · local recovery · no provider charge</p></div>
+      </div>
+      <div style="padding:16px">
+        <label for="showcase-scenario">Versioned loan scenario</label>
+        <select id="showcase-scenario">
+          <option value="complete">Complete evidence</option>
+          <option value="missing">Missing income document</option>
+          <option value="conflicting">Conflicting income versions</option>
+          <option value="fault-hostile">Synthetic fault: hostile proposal (no dispatch)</option>
+          <option value="fault-duplicate">Synthetic fault: duplicate proposal (one dispatch)</option>
+          <option value="fault-timeout">Synthetic fault: tool timeout (uncertain)</option>
+          <option value="fault-cancel">Synthetic fault: 4-second cancellation window</option>
+        </select>
+        <button class="mc-button" id="investigate-launch">Launch investigation</button>
+        <button class="mc-button" id="investigate-cancel" disabled>Cancel investigation</button>
+        <button class="mc-button" id="investigate-freeze" disabled>Freeze evidence passport</button>
+        <button class="mc-button" id="investigate-replay" disabled>Recorded replay (zero calls)</button>
+        <button class="mc-button" id="investigate-compare" disabled>Compare frozen policy floors</button>
+        <button class="mc-button" id="investigate-outcome" disabled>Refresh reviewer decision / receipt</button>
+        <label for="investigate-term">Optional policy-only what-if term (months, 6-360)</label>
+        <input id="investigate-term" type="number" min="6" max="360" step="1" placeholder="Leave blank for recorded facts">
+        <p>Comparison never re-runs specialists, calls models/tools, or changes the original case. Faults are local synthetic fixtures only.</p>
+        <p id="investigate-status" role="status" aria-live="polite">Choose a synthetic scenario.</p>
+        <p id="investigate-budget">Usage counters appear after the first persisted exchange.</p>
+        <a class="mc-button" id="investigate-review" href="/#approvals">Human review in workbench</a>
+        <ol id="investigate-timeline" aria-label="Persisted model and tool timeline"></ol>
+        <section id="investigate-comparison" hidden aria-label="Frozen policy decision laboratory"></section>
+        <section id="investigate-review-outcome" hidden aria-label="Current reviewer decision and simulated receipt"></section>
+        <pre id="investigate-playback" hidden style="white-space:pre-wrap;overflow-wrap:anywhere"></pre>
+      </div>
+    </section>
+    <section class="mc-panel mc-panel-canvas" aria-label="Agent constellation">
+      <div class="mc-panel-head">
+        <div><h1>Agent constellation</h1><p>Live nodes from the declared agent specs · edges are declared read-paths · particles are A2A messages</p></div>
+        <div class="mc-legend">
+          <span><i class="lg lg-idle"></i>idle</span>
+          <span><i class="lg lg-run"></i>running</span>
+          <span><i class="lg lg-pass"></i>pass</span>
+          <span><i class="lg lg-warn"></i>warn</span>
+          <span><i class="lg lg-fail"></i>fail</span>
+        </div>
+      </div>
+      <canvas id="constellation" aria-label="Live map of agents and their message traffic"></canvas>
+      <div class="mc-canvas-foot" id="canvas-caption">Waiting for the first flow — launch a demo scenario or submit a case from the workbench.</div>
+    </section>
+
+    <section class="mc-panel mc-panel-feed" aria-label="Live event feed">
+      <div class="mc-panel-head">
+        <div><h2>Live request / response stream</h2><p>Every agent invocation as it happens</p></div>
+        <div class="mc-feed-tools">
+          <div class="mc-filters" role="tablist" aria-label="Event filters">
+            <button class="mc-chip is-active" data-filter="all">All</button>
+            <button class="mc-chip" data-filter="AGENT">Runs</button>
+            <button class="mc-chip" data-filter="FINDING">Findings</button>
+            <button class="mc-chip" data-filter="MESSAGE">A2A</button>
+            <button class="mc-chip" data-filter="LLM">LLM</button>
+            <button class="mc-chip" data-filter="FLOW">Flow</button>
+          </div>
+          <button class="mc-chip mc-chip-toggle" id="pause-feed" aria-pressed="false">⏸ pause</button>
+        </div>
+      </div>
+      <div class="mc-feed" id="feed" aria-live="polite"></div>
+    </section>
+
+    <section class="mc-panel mc-panel-a2a" aria-label="Agent to agent collaboration">
+      <div class="mc-panel-head">
+        <div><h2>Agent ↔ Agent collaboration</h2><p>Challenge protocol &amp; blackboard messages, newest first</p></div>
+      </div>
+      <div class="mc-a2a" id="a2a-feed">
+        <div class="mc-empty" id="a2a-empty">No agent-to-agent traffic yet. Challenges, findings and escalations between agents appear here in real time.</div>
+      </div>
+    </section>
+
+    <section class="mc-panel mc-panel-llm" aria-label="LLM request response inspector">
+      <div class="mc-panel-head">
+        <div><h2>LLM inspector</h2><p>Every model call: prompt in, structured response out — click to expand</p></div>
+      </div>
+      <div class="mc-llm" id="llm-feed">
+        <div class="mc-empty" id="llm-empty">No model calls yet. Launch a demo scenario and watch each agent's prompt → response exchange land here in real time.</div>
+      </div>
+    </section>
+  </main>
+
+  <div class="mc-toast" id="toast" role="status" aria-live="polite" hidden></div>
+  <script src="/mission-control.js" defer></script>
+  <script src="/investigation.js" defer></script>
+</body>
+</html>

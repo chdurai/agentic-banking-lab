@@ -1,0 +1,4 @@
+# Tenant policy (POL-AAA-001)
+<!-- meta: version=v1; tenant=alpha -->
+## Section 1
+Alpha confidential lending threshold applies to orchard equipment.

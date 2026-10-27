@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Northstar — Your first demo, step by step</title>
+<style>
+:root{color-scheme:light;font-family:system-ui,sans-serif;color:#19324a;background:#f4f7fa;line-height:1.7}
+*{box-sizing:border-box}body{margin:0}header{background:#10263f;color:#fff;padding:45px max(22px,calc((100% - 1040px)/2))}
+header p{color:#c7e2df;max-width:740px}h1{font-size:clamp(28px,5vw,44px);line-height:1.15;letter-spacing:-.04em}
+main{max-width:1084px;padding:24px 22px 70px;margin:auto}h2{margin-top:45px;scroll-margin-top:20px}h3{margin-top:26px}
+a{color:#185cb5}header a{color:#fff}.cta{display:inline-block;background:#daf5ed;color:#134e48;padding:10px 20px;border-radius:9px;text-decoration:none;font-weight:700}
+nav,.note,.card{background:#fff;border:1px solid #d5e1e9;border-radius:12px;padding:20px;margin:18px 0}.note{border-left:5px solid #16877d;background:#effaf7}.warning{border-left-color:#af7327;background:#fff8e8}
+nav{display:flex;flex-wrap:wrap;gap:12px 22px}table{width:100%;border-collapse:collapse;background:#fff;font-size:14px}th,td{padding:12px;border:1px solid #d5e1e9;text-align:left;vertical-align:top}th{background:#e9f0f5}
+.table-wrap{overflow-x:auto}li{margin:10px 0}code{font-size:.92em;background:#e7eef4;padding:2px 5px;border-radius:4px;overflow-wrap:anywhere}
+.checklist{list-style:none;padding:0}.checklist li:before{content:"□ ";font-size:20px;color:#126d62}.muted{color:#53657a}a:focus-visible{outline:3px solid #a45c10;outline-offset:4px}
+@media print{header{background:white;color:#111;padding:0}header p{color:#333}nav,.cta{display:none}body{background:white}main{max-width:none;padding:0}a{color:inherit}.card,.note{break-inside:avoid}h2{break-after:avoid}}
+</style>
+</head>
+<body>
+<header>
+<p>NORTHSTAR / PORTFOLIO DEMO</p>
+<h1>Your first demo,<br>one clear step at a time.</h1>
+<p>You do not need banking or AI knowledge. This guide explains what each screen does,
+what to click, and how to understand the result. Everything you enter should be invented demo data.</p>
+<a class="cta" href="/">Open the workbench →</a>
+</header>
+<main>
+<nav aria-label="Guide sections">
+<a href="#start">Before you start</a><a href="#screens">Screen map</a><a href="#loan">First loan demo</a>
+<a href="#new">New applicant</a><a href="#other">Other workflows</a><a href="#review">Human review</a>
+<a href="#outcomes">Understand outcomes</a><a href="#trouble">Troubleshooting</a><a href="#checklist">Try-it checklist</a>
+<a href="#automated-demos">Automated browser demos</a>
+</nav>
+
+<section id="automated-demos">
+<h2>Run a scenario automatically in a visible browser</h2>
+<p>The repository includes eight selectable Playwright stories. They open Chromium, enter synthetic
+data, click through the actual application, check the outcome, and keep the last screen visible
+briefly so you can explain it. No manual customer-data preparation or provider API key is needed.</p>
+<p>First follow <strong>Browser automation and automatic test data</strong> in the repository README
+to install the Python browser dependencies. JDK 25 and Maven must be available. Run commands from
+the repository folder; do not type these commands into the browser address bar.</p>
+<pre><code>.venv-browser/bin/python src/test/ui/browser/demo.py --list
+.venv-browser/bin/python src/test/ui/browser/demo.py existing-loan
+.venv-browser/bin/python src/test/ui/browser/demo.py incident-approve --hold-seconds 30</code></pre>
+<p>Choose <code>existing-loan</code>, <code>new-applicant</code>, <code>incident-approve</code>,
+<code>incident-reject</code>, <code>grievance</code>, <code>document</code>,
+<code>loan-validation</code>, or <code>applicant-not-found</code>. Choose <code>all</code> for the sequence.
+Use <code>--slow-ms 800</code> to slow down actions and <code>--hold-seconds 60</code>
+to leave the final screen open longer. The application and browser close automatically afterward.</p>
+<div class="note"><strong>What to tell your audience:</strong> this uses a separate, fresh test
+application and a deterministic test AI model. The UI, APIs, workers, and review logic are real;
+customer/tool data and model answers are simulated. Your normal demo's records are not modified.
+These scripts still need a successful browser execution in a permitted environment; collection
+alone does not prove the complete journey passes.</div>
+</section>
+
+<section id="start">
+<h2>1. Before you start</h2>
+<p>This application demonstrates how several AI-assisted workflows share case tracking,
+evidence, deterministic rules, and human review. It is a portfolio application, not a connection
+to your bank. Do not enter your own financial details or anyone else's real information.</p>
+<ol>
+<li>In IntelliJ, run the existing <strong>AgenticBankingApplication</strong> configuration. After Java changes,
+stop the old run and start it again so the new code is compiled. Wait for
+<strong>“Started AgenticBankingApplication”</strong> and port <strong>8080</strong> in the console.</li>
+<li>Open <a href="/">the workbench</a> at <code>http://localhost:8080/</code>.
+If you opened this guide from a file instead of the running server, type that address in your browser.</li>
+<li>Look for <strong>API connected</strong> in the left sidebar. On a phone, the navigation is at the bottom.
+An empty case list is normal before your first submission.</li>
+<li>The full AI journey uses the application's configured model provider. A missing/invalid provider key,
+quota problem, or unavailable model can produce failure or manual review. That is not an approval or
+decline based on a customer's creditworthiness. Configure provider credentials outside source control.</li>
+</ol>
+<div class="note"><strong>What is simulated?</strong> Customer records, bureau responses,
+income checks, and incident actions are demo data/adapters. Agent analysis uses the configured model,
+unless a separately configured test model is running. The interface does not invent successful results.</div>
+<div class="note warning"><strong>Current restart behavior:</strong> newly onboarded applicants are stored
+in application memory and disappear when the app restarts. The three built-in customers return on startup.
+Cases and approvals also reset in the default memory mode; their optional database mode is configured separately.
+Refreshing your browser does not restart the app.</div>
+</section>
+
+<section id="screens">
+<h2>2. Where to go</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Screen / control</th><th>Plain-English meaning</th><th>What to do there</th></tr></thead>
+<tbody>
+<tr><td>Overview</td><td>Your starting point.</td><td>Choose Loan review, Incident response, Grievance redress, or Document intelligence.</td></tr>
+<tr><td>Cases</td><td>A case is one submitted work item.</td><td>Search loaded records, filter by workflow/status, click Open. Use Load more cases for older pages.</td></tr>
+<tr><td>Case workspace</td><td>One work item's current state and outcome.</td><td>Read “What happens next?”, then the outcome and evidence. Technical details are optional.</td></tr>
+<tr><td>Review queue</td><td>Work that needs a human decision.</td><td>Open a packet, inspect its evidence, and approve or reject with a reason.</td></tr>
+<tr><td>Refresh icon</td><td>Ask the backend for current information.</td><td>Use after a connection problem or when returning to the queue.</td></tr>
+<tr><td>Mission control</td><td>Live window into the agent swarm.</td><td>Watch agents run in the constellation, read each agent's live request/response stream, inspect every LLM prompt and structured response in the LLM inspector, and follow agent↔agent challenge messages. Use “Launch demo scenario” to fire a synthetic loan through the whole pipeline.</td></tr>
+<tr><td>How to use</td><td>This guide.</td><td>Open it whenever a term or next step is unclear.</td></tr>
+</tbody></table></div>
+<p>The overview counts cover the currently loaded case page, not a bank-wide reporting database.
+Search and filters also operate on loaded pages. A case URL contains its reference, so you can bookmark
+or refresh it and return to that case while its record still exists.</p>
+</section>
+
+<section id="loan">
+<h2>3. Your first loan demo — start here</h2>
+<p><strong>Story:</strong> an existing customer wants a loan for home repairs. You are the staff member
+preparing the request. The system already knows the customer's demo profile.</p>
+<ol>
+<li>On <strong>Overview</strong>, click the <strong>Loan review</strong> tile. Alternatively choose
+<strong>Start a new case</strong> and leave the workflow set to Loan review.</li>
+<li>At <strong>Find applicant</strong>, search for <strong>Jane</strong> or <strong>A001</strong>
+and click <strong>Search</strong>. Click Jane Cooper's record.</li>
+<li>At <strong>Review profile</strong>, read the stored income, employer, monthly debt, document
+references, and source/status. You do not retype these details. Document references such as
+<code>id.pdf</code> are illustrative names, not uploaded verified files.</li>
+<li>Click <strong>Continue to loan details</strong>. Enter <strong>25000</strong> for amount,
+<strong>home renovation</strong> for purpose, and <strong>60</strong> months for term.</li>
+<li>Click <strong>Review application</strong>. Check the summary. Use <strong>Edit loan details</strong>
+if you need to change something. Tick the confirmation checkbox only after reviewing.</li>
+<li>Click <strong>Confirm and submit</strong> once. The system creates a case and opens its workspace.
+<strong>Open</strong> means queued; <strong>Running</strong> means processing. Stay on this page;
+it checks for progress automatically while the tab is visible.</li>
+<li>Read <strong>What happens next?</strong> and the business outcome. Read each agent finding
+to understand the evidence shown. The optional technical panel contains the raw result for a developer.</li>
+<li>If the case is <strong>Pending approval</strong>, click <strong>Go to review queue</strong>
+and follow section 6. Otherwise read the final outcome; do not assume Completed means Approved.</li>
+</ol>
+<div class="note"><strong>Why these steps?</strong> The customer profile describes the person.
+The loan details describe this particular request. Separating them avoids re-entering the same
+customer information for every application. The server combines them into a case snapshot.</div>
+<h3>Other existing customers to try</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>Customer</th><th>Scenario</th><th>What to observe</th></tr></thead>
+<tbody>
+<tr><td>Jane Cooper — A001</td><td>Stronger synthetic bureau profile.</td><td>Evidence and policy evaluation for the requested amount.</td></tr>
+<tr><td>Alex Morgan — A002</td><td>More stressed bureau profile with delinquencies and a charge-off.</td><td>Risk findings, possible decline or review. No outcome is guaranteed.</td></tr>
+<tr><td>Sam Rivera — A003</td><td>Another synthetic customer/bureau scenario.</td><td>How the findings differ while the same UI journey is reused.</td></tr>
+</tbody></table></div>
+<p>Model availability, policy, request size, and configuration affect outcomes. These customers
+are examples for exploration, not guaranteed approve/decline buttons.</p>
+</section>
+
+<section id="new">
+<h2>4. Try a new applicant</h2>
+<ol>
+<li>Start a Loan review case. Click <strong>New applicant? Create a demo customer</strong>.</li>
+<li>Enter an invented name such as <strong>Taylor Example</strong>, synthetic SSN suffix
+<strong>1234</strong>, employer <strong>Demo Works</strong>, annual income <strong>85000</strong>,
+years employed <strong>4</strong>, and monthly debt <strong>400</strong>.</li>
+<li>Click <strong>Create applicant</strong>. This creates the customer record, not the loan application.
+The returned profile is marked <strong>Declared not verified</strong>.</li>
+<li>Review it and continue through loan details and confirmation as in section 3.</li>
+<li>Before restarting the app, start another loan and search for Taylor. The stored record is reusable.</li>
+</ol>
+<p>A duplicate name plus identifier suffix produces an explicit conflict; search for the existing record
+instead of creating the same person again. New applicants use the existing generic synthetic credit-bureau
+scenario. This is not a connection to a real bureau or an identity-verification service.</p>
+</section>
+
+<section id="other">
+<h2>5. Try the other three workflows</h2>
+<p>Each has a form suited to its domain. Click <strong>Use a demo example</strong> inside the form
+to load a synthetic example from the backend. It fills the form only; it does not submit.
+Review the information and click Submit case yourself. Each example receives a new reference.</p>
+<div class="card">
+<h3>Incident response — “A service is having problems”</h3>
+<p>An incident is an operational issue, such as a loan-service database connection pool becoming full.
+Choose <strong>Incident response → Use a demo example</strong>. Inspect the title, description,
+affected service, and environment. Submit it, then read the diagnosis/remediation information and execution log.
+An action may be simulated automatically or sent for human review. No real service is repaired.</p>
+</div>
+<div class="card">
+<h3>Grievance redress — “Someone raised a concern”</h3>
+<p>A grievance is a reported concern. Choose <strong>Grievance redress → Use a demo example</strong>.
+Read the invented worker welfare report, project reference, and received-through field. Submit it.
+Look for the responsible team, illustrative response deadline, and whether human review is needed.
+A routed/drafted response does not mean an email or message was actually sent.</p>
+<p>Do not use real sensitive reports. Restricted handling may intentionally show only generic information.</p>
+</div>
+<div class="card">
+<h3>Document intelligence — “Turn document text into useful facts”</h3>
+<p>Choose <strong>Document intelligence → Use a demo example</strong>. This loads synthetic invoice
+text. Read it and submit. The outcome shows document type, extracted fields, flags, suggested actions,
+and next queue when available. Confidence is model-reported, not proof of correctness.
+This screen accepts text; it is not a file-upload or scanned-image OCR screen.</p>
+</div>
+</section>
+
+<section id="review">
+<h2>6. Complete human review when the system asks</h2>
+<p>Not every case creates a review. If the queue is empty, that is normal.
+A higher-risk application or incident may create one, but policy and model results determine this.</p>
+<ol>
+<li>Click <strong>Review queue</strong>. Refresh if the pending case just finished processing.</li>
+<li>Open <strong>Review packet</strong> for the relevant title/reference. Check the facts, findings,
+uncertainty, policy checks, and “What your decision does.”</li>
+<li>If it says <strong>Independent assessment first</strong>, record your view before the AI recommendation
+is shown. This first step does not execute an action. Then inspect the revealed evidence and make a separate final decision.</li>
+<li>Click <strong>Record a decision</strong>. For the demo, a reason code can be
+<code>DEMO_REVIEWED</code>. Add a note explaining why. Choose <strong>Approve</strong> or <strong>Reject</strong>.</li>
+<li>After the server confirms, the item leaves the pending queue. Return to <strong>Cases</strong>,
+open the associated case, and refresh. The case state reflects the human outcome.</li>
+</ol>
+<div class="note warning"><strong>If the packet changed:</strong> the app refreshes it instead of silently
+using your old decision. Read it again. If the backend refuses a decision, its configured reviewer role,
+expiry, or requester/reviewer separation rule may apply. The UI does not bypass those rules.</div>
+<p>An approval is not proof that an external action succeeded. <strong>Execution failed</strong> is
+a separate state. Also, the original AI analysis is retained after review rather than rewritten as
+if the model made a new decision.</p>
+</section>
+
+<section id="outcomes">
+<h2>7. Understand the words on the screen</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Term</th><th>Meaning</th><th>Your next step</th></tr></thead>
+<tbody>
+<tr><td>Open</td><td>The server accepted the case and queued it.</td><td>Wait; do not submit again.</td></tr>
+<tr><td>Running</td><td>The workflow is processing.</td><td>Keep the case open; progress refreshes automatically.</td></tr>
+<tr><td>Completed</td><td>Processing finished.</td><td>Read the separate business outcome: approved, declined, routed, analyzed, or something else.</td></tr>
+<tr><td>Pending approval</td><td>A human must review the work.</td><td>Open the review queue.</td></tr>
+<tr><td>Approved / Rejected</td><td>A human review outcome was recorded.</td><td>Read the retained analysis and action result; no real funds move.</td></tr>
+<tr><td>Failed / Execution failed</td><td>Processing or an action did not finish successfully.</td><td>Check the console/configuration; do not interpret it as a negative credit verdict.</td></tr>
+<tr><td>Blocked / Compliance hold</td><td>Automatic processing stopped or requires restricted review.</td><td>Read the generic routing instructions; some details are intentionally withheld.</td></tr>
+<tr><td>Expired</td><td>A review deadline elapsed.</td><td>A new reviewed attempt may be needed.</td></tr>
+<tr><td>APR</td><td>Annual percentage rate: the displayed yearly loan interest rate.</td><td>Treat it as a demo outcome, not a real offer.</td></tr>
+<tr><td>Evidence / finding</td><td>Information used by a check, or its reported observation.</td><td>Read source/status; simulated and model-generated information is not independently verified.</td></tr>
+<tr><td>Idempotency</td><td>A technical safeguard against creating the same case twice during a retry.</td><td>Retry an unchanged failed submission within the same open form; do not repeatedly start fresh forms after an uncertain timeout.</td></tr>
+</tbody></table></div>
+</section>
+
+<section id="trouble">
+<h2>8. If something goes wrong</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>What you see</th><th>What it usually means</th><th>What to do</th></tr></thead>
+<tbody>
+<tr><td>Localhost refused to connect</td><td>No server is listening.</td><td>Run AgenticBankingApplication in IntelliJ and wait for startup on port 8080.</td></tr>
+<tr><td>Applicant lookup returns 404 after a code update</td><td>The running app may still use the old classes.</td><td>Rebuild/restart AgenticBankingApplication; refresh the browser.</td></tr>
+<tr><td>401 / 403</td><td>Backend caller configuration requires authentication or a role.</td><td>Use the intended local demo run configuration. Do not paste secrets into the form or try to bypass role checks.</td></tr>
+<tr><td>Running for a long time / model unavailable</td><td>Model calls may be timing out, rate-limited, or misconfigured.</td><td>Check the IDE console and provider configuration. You can leave and return using the case URL.</td></tr>
+<tr><td>Network timeout during submission</td><td>The server may already have accepted it.</td><td>Retry unchanged within the same form, which reuses the submission key. Also inspect Cases before starting a new application.</td></tr>
+<tr><td>Customer disappeared after restart</td><td>The applicant directory is in memory.</td><td>Use a built-in customer or onboard the demo applicant again.</td></tr>
+<tr><td>Old case link not found</td><td>The record may have reset in memory or be unavailable to the caller.</td><td>Return to Cases and choose an existing case.</td></tr>
+<tr><td>Stale approval / conflict</td><td>Someone or something updated the packet.</td><td>Review the refreshed packet and decide again only after checking it.</td></tr>
+</tbody></table></div>
+</section>
+
+<section id="checklist">
+<h2>9. Your try-it checklist</h2>
+<ul class="checklist">
+<li>Open the workbench and see API connected.</li>
+<li>Select Jane without typing her income or identity details again.</li>
+<li>Submit a loan through the review/confirmation step.</li>
+<li>Refresh the browser on the case page and return to the same case.</li>
+<li>Read the outcome without needing the technical JSON panel.</li>
+<li>Create a new synthetic applicant, then find the record again.</li>
+<li>Try the invoice, incident, and grievance demo examples.</li>
+<li>If a review is generated, complete it and reopen the case.</li>
+<li>Explain the distinction between case completion, business outcome, and human approval.</li>
+</ul>
+<h3>What you can say while showcasing the application</h3>
+<p>“This demo starts with a customer record rather than re-entering data. Each submission becomes
+a trackable case. Specialized AI checks return findings, deterministic policy constrains decisions,
+and important actions can require a human review. The UI makes the next step explicit and preserves
+the original analysis. External banking adapters are simulated for the portfolio.”</p>
+<p class="muted">Implementation checks cover UI behavior and contracts where the environment permits.
+They are not evidence of live-model accuracy or real financial-system integration.
+If a developer reports a build/runtime restriction, resolve that before expecting new backend
+features to appear in the running application.</p>
+<a class="cta" href="/">Try the workbench →</a>
+</section>
+</main>
+</body>
+</html>

@@ -1,0 +1,39 @@
+{
+  "nodes": [
+    {"id": "customer-portal", "type": "APPLICATION", "name": "Customer Portal", "owner": "digital-channels", "tier": 1},
+    {"id": "mobile-app", "type": "APPLICATION", "name": "Mobile Banking App", "owner": "digital-channels", "tier": 1},
+    {"id": "api-gateway", "type": "SERVICE", "name": "API Gateway", "owner": "platform-engineering", "tier": 1},
+    {"id": "auth-service", "type": "SERVICE", "name": "Auth Service", "owner": "identity-security", "tier": 1},
+    {"id": "loan-service", "type": "SERVICE", "name": "Loan Service", "owner": "lending-platform", "tier": 1},
+    {"id": "kyc-service", "type": "SERVICE", "name": "KYC Service", "owner": "financial-crime", "tier": 1},
+    {"id": "decision-engine", "type": "SERVICE", "name": "Decision Engine", "owner": "lending-platform", "tier": 2},
+    {"id": "notification-service", "type": "SERVICE", "name": "Notification Service", "owner": "digital-channels", "tier": 3},
+    {"id": "credit-bureau-adapter", "type": "EXTERNAL", "name": "Credit Bureau Adapter", "owner": "vendor-management", "tier": 2},
+    {"id": "sanctions-api", "type": "EXTERNAL", "name": "Sanctions Screening API", "owner": "financial-crime", "tier": 1},
+    {"id": "loan-db", "type": "DATABASE", "name": "Loan DB (PostgreSQL)", "owner": "dba-team", "tier": 1},
+    {"id": "message-bus", "type": "INFRASTRUCTURE", "name": "Event Bus (Kafka)", "owner": "platform-engineering", "tier": 1},
+    {"id": "core-banking", "type": "SERVICE", "name": "Core Banking Ledger", "owner": "core-systems", "tier": 1},
+    {"id": "RB-DB-001", "type": "RUNBOOK", "name": "Database Connection Pool Exhaustion", "owner": "dba-team", "tier": 0},
+    {"id": "RB-API-002", "type": "RUNBOOK", "name": "API Error Rate Spike", "owner": "platform-engineering", "tier": 0},
+    {"id": "RB-SEC-003", "type": "RUNBOOK", "name": "Security Alert Response", "owner": "identity-security", "tier": 0}
+  ],
+  "edges": [
+    {"from": "customer-portal", "to": "api-gateway", "relation": "DEPENDS_ON"},
+    {"from": "mobile-app", "to": "api-gateway", "relation": "DEPENDS_ON"},
+    {"from": "api-gateway", "to": "auth-service", "relation": "DEPENDS_ON"},
+    {"from": "api-gateway", "to": "loan-service", "relation": "DEPENDS_ON"},
+    {"from": "loan-service", "to": "loan-db", "relation": "DEPENDS_ON"},
+    {"from": "loan-service", "to": "kyc-service", "relation": "DEPENDS_ON"},
+    {"from": "loan-service", "to": "decision-engine", "relation": "DEPENDS_ON"},
+    {"from": "loan-service", "to": "message-bus", "relation": "DEPENDS_ON"},
+    {"from": "loan-service", "to": "core-banking", "relation": "DEPENDS_ON"},
+    {"from": "kyc-service", "to": "sanctions-api", "relation": "DEPENDS_ON"},
+    {"from": "decision-engine", "to": "credit-bureau-adapter", "relation": "DEPENDS_ON"},
+    {"from": "decision-engine", "to": "loan-db", "relation": "DEPENDS_ON"},
+    {"from": "notification-service", "to": "message-bus", "relation": "DEPENDS_ON"},
+    {"from": "loan-db", "to": "RB-DB-001", "relation": "DOCUMENTED_BY"},
+    {"from": "loan-service", "to": "RB-API-002", "relation": "DOCUMENTED_BY"},
+    {"from": "api-gateway", "to": "RB-API-002", "relation": "DOCUMENTED_BY"},
+    {"from": "auth-service", "to": "RB-SEC-003", "relation": "DOCUMENTED_BY"}
+  ]
+}

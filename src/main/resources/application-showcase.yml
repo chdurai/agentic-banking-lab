@@ -1,0 +1,53 @@
+server:
+  address: 127.0.0.1
+agents:
+  rag-mode: keyword
+  fallback-model: scripted-showcase
+  models:
+    planner: scripted-showcase
+    intake: scripted-showcase
+    kyc: scripted-showcase
+    credit-risk: scripted-showcase
+    compliance: scripted-showcase
+    decision: scripted-showcase
+    critic: scripted-showcase
+    incident-triage: scripted-showcase
+    incident-diagnosis: scripted-showcase
+    incident-remediation: scripted-showcase
+    grievance-triage: scripted-showcase
+    grievance-response: scripted-showcase
+    document-analysis: scripted-showcase
+    document-chunk: scripted-showcase
+spring:
+  ai:
+    model:
+      chat: none
+      embedding: none
+    mcp:
+      client:
+        enabled: false
+      server:
+        enabled: false
+platform:
+  persistence: jdbc
+  datasource:
+    url: jdbc:h2:file:./data/showcase/platform
+  loan:
+    investigation:
+      enabled: true
+    recovery-simulation: true
+  llm:
+    provider: scripted-showcase
+    routes:
+      loan-investigator:
+        primary: scripted-showcase
+        fallback: scripted-showcase
+    resilience:
+      retry:
+        max: 0
+    budget:
+      per-case:
+        loan:
+          max-tokens: 40000
+          max-cost-usd: 0
+          max-ms: 120000
