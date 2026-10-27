@@ -1,0 +1,30 @@
+q01	POL-CRD-001	1	verifiable income minimum FICO unsecured eligibility bankruptcy
+q02	POL-CRD-001	1	active bankruptcy applicants ineligible
+q03	POL-CRD-001	2	unsecured personal loan maximum term capped amount
+q04	POL-CRD-001	2	two independent income documents loan amounts above 50000
+q05	POL-CRD-001	3	total DTI proposed payment senior underwriter
+q06	POL-CRD-001	3	debt income ratio standard risk 36%
+q07	POL-CRD-001	4	base APR pricing risk premium
+q08	POL-CRD-001	4	TILA Regulation Z disclosed rates consummation
+q09	POL-CRD-001	5	charge-off older than 24 months approved conditions
+q10	POL-CRD-001	5	two delinquencies last 12 months manual review
+q11	POL-AML-002	1	sanctions screened OFAC SDN consolidated lists
+q12	POL-AML-002	1	confirmed sanctions match reported BSA officer
+q13	POL-AML-002	2	politically exposed persons enhanced due diligence
+q14	POL-AML-002	2	PEP source-of-funds documentation senior management
+q15	POL-AML-002	3	identity verified two independent sources
+q16	POL-AML-002	3	unverifiable identity suspension not decline
+q17	POL-AML-002	4	layer structure funds SAR review
+q18	POL-AML-002	4	suspicious rapid repayment vague investment
+q19	POL-FLN-003	1	ECOA prohibited bases credit decisions
+q20	POL-FLN-003	1	public assistance consumer rights protected
+q21	POL-FLN-003	2	adverse action principal reasons within 30 days
+q22	POL-FLN-003	2	generic reasons non-compliant specific debt-to-income
+q23	POL-FLN-003	3	similar applicants similar outcomes consistency
+q24	POL-FLN-003	3	materially different treatment fair-lending review
+q25	POL-FLN-003	4	decision factors documented retained 25 months
+q26	POL-FLN-003	4	documentation retention minimum
+q27	POL-CRD-001	1	580 FICO score minimum
+q28	POL-CRD-001	2	maximum unsecured personal loans 100000 84 months
+q29	POL-AML-002	2	EDD PEP documentation
+q30	POL-FLN-003	2	specific accurate principal reasons declined applicants

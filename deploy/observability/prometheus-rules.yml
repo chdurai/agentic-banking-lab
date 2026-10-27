@@ -1,0 +1,65 @@
+groups:
+  - name: agentic-banking
+    rules:
+      - record: flow:case_latency_target_met:ratio5m
+        expr: |
+          (sum by (flow) (rate(case_processing_seconds_bucket{job="agentic-banking",flow="loan",le="20.0"}[5m]))
+            / sum by (flow) (rate(case_processing_seconds_count{job="agentic-banking",flow="loan"}[5m])))
+          or
+          (sum by (flow) (rate(case_processing_seconds_bucket{job="agentic-banking",flow="grievance",le="10.0"}[5m]))
+            / sum by (flow) (rate(case_processing_seconds_count{job="agentic-banking",flow="grievance"}[5m])))
+          or
+          (sum by (flow) (rate(case_processing_seconds_bucket{job="agentic-banking",flow=~"incident|document",le="30.0"}[5m]))
+            / sum by (flow) (rate(case_processing_seconds_count{job="agentic-banking",flow=~"incident|document"}[5m])))
+      - alert: CaseLatencyTargetMissed
+        expr: |
+          flow:case_latency_target_met:ratio5m < 0.95
+          and on (flow) sum by (flow) (increase(case_processing_seconds_count{job="agentic-banking"}[5m])) >= 20
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Initial case disposition latency exceeds its hypothesis target"
+      - alert: CaseProcessingFailures
+        expr: |
+          sum(increase(case_processing_seconds_count{job="agentic-banking",status="FAILED"}[5m]))
+            / sum(increase(case_processing_seconds_count{job="agentic-banking"}[5m])) > 0.005
+          and sum(increase(case_processing_seconds_count{job="agentic-banking"}[5m])) >= 20
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Initial case processing exceeds the illustrative 0.5% failure budget"
+      - alert: ApiAvailabilityTargetMissed
+        expr: |
+          sum(increase(http_server_requests_seconds_count{job="agentic-banking",uri!~"/actuator.*",status=~"5.."}[5m]))
+            / sum(increase(http_server_requests_seconds_count{job="agentic-banking",uri!~"/actuator.*"}[5m])) > 0.005
+          and sum(increase(http_server_requests_seconds_count{job="agentic-banking",uri!~"/actuator.*"}[5m])) >= 20
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "API server errors exceed the illustrative 99.5% demo availability target"
+      - alert: EstimatedMonthlyModelSpend
+        expr: sum(increase(agent_cost_usd_total{job="agentic-banking"}[30d])) > 100
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Reported model usage exceeds the example USD 100 rolling 30-day threshold"
+      - alert: IncompleteModelSpendTelemetry
+        expr: |
+          sum(increase(agent_usage_unpriced_total{job="agentic-banking"}[5m])) > 0
+          or sum(increase(llm_usage_estimated_total{job="agentic-banking"}[5m])) > 0
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Provider usage or configured pricing is incomplete; spend telemetry is not billing"
+      - alert: ProviderHealthBudgetExhausted
+        expr: max by (provider) (llm_provider_budget_state{job="agentic-banking"}) == 2
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Provider health admission is open on at least one replica; flows degrade without new calls"

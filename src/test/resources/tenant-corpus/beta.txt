@@ -1,0 +1,4 @@
+# Tenant policy (POL-BBB-001)
+<!-- meta: version=v1; tenant=beta -->
+## Section 1
+Beta confidential lending threshold applies to orchard equipment.

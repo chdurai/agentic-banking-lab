@@ -1,0 +1,65 @@
+{
+  "uid": "agentic-banking-capacity",
+  "title": "Agentic banking - capacity and estimated spend",
+  "schemaVersion": 39,
+  "version": 1,
+  "editable": true,
+  "refresh": "30s",
+  "time": {"from": "now-1h", "to": "now"},
+  "templating": {
+    "list": [{"name": "datasource", "type": "datasource", "query": "prometheus"}]
+  },
+  "panels": [
+    {
+      "id": 1, "type": "timeseries", "title": "Durable queue depth (shared DB: max, not sum)",
+      "datasource": {"type": "prometheus", "uid": "$datasource"},
+      "gridPos": {"x": 0, "y": 0, "w": 12, "h": 8},
+      "targets": [{"refId": "A", "expr": "max(case_queue_depth{job=\"agentic-banking\"})", "legendFormat": "queued"}]
+    },
+    {
+      "id": 2, "type": "timeseries", "title": "In-flight gateway model operations",
+      "datasource": {"type": "prometheus", "uid": "$datasource"},
+      "gridPos": {"x": 12, "y": 0, "w": 12, "h": 8},
+      "targets": [{"refId": "A", "expr": "sum(llm_calls_inflight{job=\"agentic-banking\"})", "legendFormat": "active"}]
+    },
+    {
+      "id": 3, "type": "timeseries", "title": "Initial disposition p95, including queue time (seconds)",
+      "datasource": {"type": "prometheus", "uid": "$datasource"},
+      "gridPos": {"x": 0, "y": 8, "w": 12, "h": 8},
+      "targets": [{"refId": "A", "expr": "histogram_quantile(0.95, sum by (le, flow) (rate(case_processing_seconds_bucket{job=\"agentic-banking\"}[5m])))", "legendFormat": "{{flow}}"}]
+    },
+    {
+      "id": 4, "type": "timeseries", "title": "Initial dispositions / second",
+      "datasource": {"type": "prometheus", "uid": "$datasource"},
+      "gridPos": {"x": 12, "y": 8, "w": 12, "h": 8},
+      "targets": [{"refId": "A", "expr": "sum by (flow, status) (rate(case_processing_seconds_count{job=\"agentic-banking\"}[5m]))", "legendFormat": "{{flow}} {{status}}"}]
+    },
+    {
+      "id": 5, "type": "timeseries", "title": "Rolling 30-day estimated USD (reported usage only, not billing)",
+      "datasource": {"type": "prometheus", "uid": "$datasource"},
+      "gridPos": {"x": 0, "y": 16, "w": 12, "h": 8},
+      "targets": [{"refId": "A", "expr": "sum(increase(agent_cost_usd_total{job=\"agentic-banking\"}[30d]))", "legendFormat": "estimated USD"}]
+    },
+    {
+      "id": 6, "type": "timeseries", "title": "Missing usage / unpriced calls (spend estimate incomplete)",
+      "datasource": {"type": "prometheus", "uid": "$datasource"},
+      "gridPos": {"x": 12, "y": 16, "w": 12, "h": 8},
+      "targets": [
+        {"refId": "A", "expr": "sum(rate(llm_usage_estimated_total{job=\"agentic-banking\"}[5m]))", "legendFormat": "missing usage"},
+        {"refId": "B", "expr": "sum(rate(agent_usage_unpriced_total{job=\"agentic-banking\"}[5m]))", "legendFormat": "missing price"}
+      ]
+    },
+    {
+      "id": 7, "type": "timeseries", "title": "Bounded investigation stops (synthetic showcase or explicitly enabled live mode)",
+      "datasource": {"type": "prometheus", "uid": "$datasource"},
+      "gridPos": {"x": 0, "y": 24, "w": 12, "h": 8},
+      "targets": [{"refId": "A", "expr": "sum by (reason) (rate(investigation_terminations_total{job=\"agentic-banking\"}[5m]))", "legendFormat": "{{reason}}"}]
+    },
+    {
+      "id": 8, "type": "timeseries", "title": "Optional read-only tool dispatches",
+      "datasource": {"type": "prometheus", "uid": "$datasource"},
+      "gridPos": {"x": 12, "y": 24, "w": 12, "h": 8},
+      "targets": [{"refId": "A", "expr": "sum by (tool) (rate(investigation_tool_dispatches_total{job=\"agentic-banking\"}[5m]))", "legendFormat": "{{tool}}"}]
+    }
+  ]
+}

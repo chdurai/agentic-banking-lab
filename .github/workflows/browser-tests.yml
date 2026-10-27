@@ -1,0 +1,98 @@
+name: Browser UI tests
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  browser-ui:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        layout: [desktop, mobile]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Build React workbench
+        run: |
+          npm ci --prefix frontend
+          npm run build --prefix frontend
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: src/test/ui/browser/requirements.txt
+      - name: Install browser test dependencies
+        run: |
+          python -m pip install -r src/test/ui/browser/requirements.txt
+          python -m playwright install --with-deps chromium
+      - name: Run real-browser UI tests with controlled APIs
+        env:
+          LAYOUT: ${{ matrix.layout }}
+        run: |
+          args=()
+          if [ "$LAYOUT" = mobile ]; then args+=(--mobile-layout); fi
+          python -m pytest src/test/ui/browser/test_workbench.py src/test/ui/browser/test_react_workbench.py --browser chromium \
+            --tracing retain-on-failure --screenshot only-on-failure \
+            --output browser-results --junitxml=browser-results/results.xml "${args[@]}"
+      - name: Upload browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-ui-${{ matrix.layout }}
+          path: browser-results/
+          if-no-files-found: warn
+
+  browser-backend:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+          cache: maven
+      - name: Build React workbench
+        run: |
+          npm ci --prefix frontend
+          npm run build --prefix frontend
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: src/test/ui/browser/requirements.txt
+      - name: Install browser test dependencies
+        run: |
+          python -m pip install -r src/test/ui/browser/requirements.txt
+          python -m playwright install --with-deps chromium
+      - name: Real browser and backend with deterministic model
+        run: mvn -B -Dtest=BrowserJourneyIT test
+      - name: No-key showcase browser release gate
+        run: mvn -B -Dtest=ShowcaseBrowserJourneyIT test
+      - name: Upload backend journey evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-backend-journeys
+          path: |
+            browser-results/backend/
+            browser-results/showcase/
+            target/surefire-reports/*BrowserJourneyIT*
+          if-no-files-found: warn

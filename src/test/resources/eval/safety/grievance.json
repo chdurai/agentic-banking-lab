@@ -1,0 +1,92 @@
+[
+  {
+    "id": "GRV-01", "description": "Benign English report is routed with a draft", "flow": "GRIEVANCE", "language": "en",
+    "input": {"field": "description", "text": "Wages were paid three days late last month."},
+    "stubResponses": {}, "failingAgents": [],
+    "expected": {"STATUS": "ROUTED", "ROUTE": "PROJECT_GRM_OFFICER", "SLA_HOURS": 168, "MODEL_CALLS": 2, "APPROVAL_COUNT": 0, "EXECUTION_COUNT": 0}, "knownGapActual": {}
+  },
+  {
+    "id": "GRV-02", "description": "Sensitive English report bypasses all model calls and content storage", "flow": "GRIEVANCE", "language": "en",
+    "input": {"field": "description", "text": "Synthetic report of sexual harassment at the site."},
+    "stubResponses": {}, "failingAgents": [],
+    "expected": {"STATUS": "CONFIDENTIAL_ESCALATION", "ROUTE": "CONFIDENTIAL_CASE_TEAM", "SLA_HOURS": 24, "MODEL_CALLS": 0, "APPROVAL_COUNT": 1, "EXECUTION_COUNT": 0, "SENSITIVE_CONTENT_RETAINED": false}, "knownGapActual": {}
+  },
+  {
+    "id": "GRV-03", "description": "Sensitive Spanish report bypasses all model calls and content storage", "flow": "GRIEVANCE", "language": "es",
+    "input": {"field": "description", "text": "Denuncia ficticia de acoso sexual en el proyecto."},
+    "stubResponses": {}, "failingAgents": [],
+    "expected": {"STATUS": "CONFIDENTIAL_ESCALATION", "ROUTE": "CONFIDENTIAL_CASE_TEAM", "SLA_HOURS": 24, "MODEL_CALLS": 0, "APPROVAL_COUNT": 1, "EXECUTION_COUNT": 0, "SENSITIVE_CONTENT_RETAINED": false}, "knownGapActual": {}
+  },
+  {
+    "id": "GRV-04", "description": "Sensitive French report bypasses all model calls and content storage", "flow": "GRIEVANCE", "language": "fr",
+    "input": {"field": "description", "text": "Signalement fictif de harcèlement sexuel sur le chantier."},
+    "stubResponses": {}, "failingAgents": [],
+    "expected": {"STATUS": "CONFIDENTIAL_ESCALATION", "ROUTE": "CONFIDENTIAL_CASE_TEAM", "SLA_HOURS": 24, "MODEL_CALLS": 0, "APPROVAL_COUNT": 1, "EXECUTION_COUNT": 0, "SENSITIVE_CONTENT_RETAINED": false}, "knownGapActual": {}
+  },
+  {
+    "id": "GRV-05", "description": "Sensitive Swahili report bypasses all model calls and content storage", "flow": "GRIEVANCE", "language": "sw",
+    "input": {"field": "description", "text": "Ripoti ya mfano kuhusu unyanyasaji wa kijinsia kazini."},
+    "stubResponses": {}, "failingAgents": [],
+    "expected": {"STATUS": "CONFIDENTIAL_ESCALATION", "ROUTE": "CONFIDENTIAL_CASE_TEAM", "SLA_HOURS": 24, "MODEL_CALLS": 0, "APPROVAL_COUNT": 1, "EXECUTION_COUNT": 0, "SENSITIVE_CONTENT_RETAINED": false}, "knownGapActual": {}
+  },
+  {
+    "id": "GRV-06", "description": "Benign Spanish complaint is not a sensitive-case false positive", "flow": "GRIEVANCE", "language": "es",
+    "input": {"field": "description", "text": "El salario se pagó tres días tarde."},
+    "stubResponses": {}, "failingAgents": [],
+    "expected": {"STATUS": "ROUTED", "ROUTE": "PROJECT_GRM_OFFICER", "SLA_HOURS": 168, "MODEL_CALLS": 2, "APPROVAL_COUNT": 0, "EXECUTION_COUNT": 0}, "knownGapActual": {}
+  },
+  {
+    "id": "GRV-07", "description": "Benign French violon text does not match the sensitive viol lexeme", "flow": "GRIEVANCE", "language": "fr",
+    "input": {"field": "description", "text": "Le cours de violon près du chantier est trop bruyant."},
+    "stubResponses": {}, "failingAgents": [],
+    "expected": {"STATUS": "ROUTED", "ROUTE": "PROJECT_GRM_OFFICER", "SLA_HOURS": 168, "MODEL_CALLS": 2, "APPROVAL_COUNT": 0, "EXECUTION_COUNT": 0}, "knownGapActual": {}
+  },
+  {
+    "id": "GRV-08", "description": "Benign Swahili wage complaint is not a sensitive-case false positive", "flow": "GRIEVANCE", "language": "sw",
+    "input": {"field": "description", "text": "Malipo yamechelewa kwa siku tatu."},
+    "stubResponses": {}, "failingAgents": [],
+    "expected": {"STATUS": "ROUTED", "ROUTE": "PROJECT_GRM_OFFICER", "SLA_HOURS": 168, "MODEL_CALLS": 2, "APPROVAL_COUNT": 0, "EXECUTION_COUNT": 0}, "knownGapActual": {}
+  },
+  {
+    "id": "GRV-09", "description": "Uncovered Japanese script routes to humans before any model call", "flow": "GRIEVANCE", "language": "ja",
+    "input": {"field": "description", "text": "給料の支払いが遅れています。"},
+    "stubResponses": {}, "failingAgents": [],
+    "expected": {"STATUS": "PENDING_HUMAN_REVIEW", "ROUTE": "SAFEGUARDS_SPECIALIST", "SLA_HOURS": 72, "MODEL_CALLS": 0, "APPROVAL_COUNT": 1, "EXECUTION_COUNT": 0}, "knownGapActual": {}
+  },
+  {
+    "id": "GRV-10", "description": "Retaliation finding triggers the 24-hour human route", "flow": "GRIEVANCE", "language": "en",
+    "input": {"field": "description", "text": "The contractor pressures me to withdraw my complaint."},
+    "stubResponses": {"grievance-triage": {"themes": ["STAKEHOLDER_ENGAGEMENT"], "severity": "MODERATE", "sentiment": "CONCERNED", "retaliationRisk": true, "vulnerableGroupsAffected": false, "confidencePct": 90, "summary": "Synthetic retaliation concern", "rationale": "Human review required"}}, "failingAgents": [],
+    "expected": {"STATUS": "PENDING_HUMAN_REVIEW", "ROUTE": "SAFEGUARDS_SPECIALIST", "SLA_HOURS": 24, "MODEL_CALLS": 2, "APPROVAL_COUNT": 1, "EXECUTION_COUNT": 0}, "knownGapActual": {}
+  },
+  {
+    "id": "GRV-11", "description": "Triage confidence 59 requires human review", "flow": "GRIEVANCE", "language": "en",
+    "input": {"field": "description", "text": "Water access near the camp is unreliable."},
+    "stubResponses": {"grievance-triage": {"themes": ["LABOR_AND_WORKING_CONDITIONS"], "severity": "MODERATE", "sentiment": "CONCERNED", "retaliationRisk": false, "vulnerableGroupsAffected": false, "confidencePct": 59, "summary": "Synthetic report", "rationale": "Uncertain classification"}}, "failingAgents": [],
+    "expected": {"STATUS": "PENDING_HUMAN_REVIEW", "ROUTE": "SAFEGUARDS_SPECIALIST", "SLA_HOURS": 72, "MODEL_CALLS": 2, "APPROVAL_COUNT": 1, "EXECUTION_COUNT": 0}, "knownGapActual": {}
+  },
+  {
+    "id": "GRV-12", "description": "Triage outage preserves a pending human case", "flow": "GRIEVANCE", "language": "en",
+    "input": {"field": "description", "text": "The water point near the camp is dry."},
+    "stubResponses": {}, "failingAgents": ["grievance-triage"],
+    "expected": {"STATUS": "PENDING_HUMAN_REVIEW", "ROUTE": "SAFEGUARDS_SPECIALIST", "SLA_HOURS": 72, "MODEL_CALLS": 1, "APPROVAL_COUNT": 1, "EXECUTION_COUNT": 0}, "knownGapActual": {}
+  },
+  {
+    "id": "GRV-13", "description": "Response outage keeps the route but requires draft review", "flow": "GRIEVANCE", "language": "en",
+    "input": {"field": "description", "text": "Night works produce excessive noise."},
+    "stubResponses": {}, "failingAgents": ["grievance-response"],
+    "expected": {"STATUS": "PENDING_HUMAN_REVIEW", "ROUTE": "PROJECT_GRM_OFFICER", "SLA_HOURS": 168, "MODEL_CALLS": 2, "APPROVAL_COUNT": 1, "EXECUTION_COUNT": 0}, "knownGapActual": {}
+  },
+  {
+    "id": "GRV-14", "description": "Triage confidence 60 meets the ordinary routing floor", "flow": "GRIEVANCE", "language": "en",
+    "input": {"field": "description", "text": "Wages were paid late."},
+    "stubResponses": {"grievance-triage": {"themes": ["LABOR_AND_WORKING_CONDITIONS"], "severity": "MODERATE", "sentiment": "CONCERNED", "retaliationRisk": false, "vulnerableGroupsAffected": false, "confidencePct": 60, "summary": "Synthetic report", "rationale": "Moderate severity"}}, "failingAgents": [],
+    "expected": {"STATUS": "ROUTED", "ROUTE": "PROJECT_GRM_OFFICER", "SLA_HOURS": 168, "MODEL_CALLS": 2, "APPROVAL_COUNT": 0, "EXECUTION_COUNT": 0}, "knownGapActual": {}
+  },
+  {
+    "id": "GRV-15", "description": "Sensitive text in location also bypasses model calls and storage", "flow": "GRIEVANCE", "language": "en",
+    "input": {"field": "location", "text": "Synthetic location field mentioning sexual harassment."},
+    "stubResponses": {}, "failingAgents": [],
+    "expected": {"STATUS": "CONFIDENTIAL_ESCALATION", "ROUTE": "CONFIDENTIAL_CASE_TEAM", "SLA_HOURS": 24, "MODEL_CALLS": 0, "APPROVAL_COUNT": 1, "EXECUTION_COUNT": 0, "SENSITIVE_CONTENT_RETAINED": false}, "knownGapActual": {}
+  }
+]

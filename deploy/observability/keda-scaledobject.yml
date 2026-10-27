@@ -1,0 +1,42 @@
+apiVersion: keda.sh/v1alpha1
+kind: TriggerAuthentication
+metadata:
+  name: agentic-banking-prometheus
+spec:
+  secretTargetRef:
+    - parameter: bearerToken
+      name: prometheus-reader
+      key: token
+---
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: agentic-banking
+  annotations:
+    autoscaling.keda.sh/paused: "true"
+spec:
+  scaleTargetRef:
+    name: agentic-banking
+  minReplicaCount: 1
+  maxReplicaCount: 1
+  pollingInterval: 30
+  cooldownPeriod: 300
+  triggers:
+    - type: prometheus
+      metadata:
+        serverAddress: https://prometheus.example.internal
+        query: max(case_queue_depth{job="agentic-banking"} >= 0)
+        threshold: "5"
+        ignoreNullValues: "false"
+        authModes: bearer
+      authenticationRef:
+        name: agentic-banking-prometheus
+    - type: prometheus
+      metadata:
+        serverAddress: https://prometheus.example.internal
+        query: sum(llm_calls_inflight{job="agentic-banking"})
+        threshold: "8"
+        ignoreNullValues: "false"
+        authModes: bearer
+      authenticationRef:
+        name: agentic-banking-prometheus

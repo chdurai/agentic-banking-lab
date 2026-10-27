@@ -1,0 +1,74 @@
+[
+  {
+    "id": "GC-001",
+    "description": "Strong borrower, clean file - should approve",
+    "application": {
+      "applicantId": "A001",
+      "fullName": "Jane Cooper",
+      "ssnLast4": "4321",
+      "annualIncome": 145000,
+      "employmentYears": 8,
+      "requestedAmount": 35000,
+      "loanPurpose": "home renovation",
+      "termMonths": 60,
+      "existingMonthlyDebt": 1200,
+      "employer": "Acme Corp",
+      "documents": ["paystubs.pdf", "id.pdf", "bank-statements.pdf"]
+    },
+    "expectedDecision": "APPROVED"
+  },
+  {
+    "id": "GC-002",
+    "description": "Subprime borrower with charge-off and high DTI - manual review or decline",
+    "application": {
+      "applicantId": "A002",
+      "fullName": "Sam Reyes",
+      "ssnLast4": "9987",
+      "annualIncome": 72000,
+      "employmentYears": 3,
+      "requestedAmount": 45000,
+      "loanPurpose": "debt consolidation",
+      "termMonths": 60,
+      "existingMonthlyDebt": 2100,
+      "employer": "Globex",
+      "documents": ["paystubs.pdf", "id.pdf"]
+    },
+    "expectedDecision": "MANUAL_REVIEW"
+  },
+  {
+    "id": "GC-003",
+    "description": "Sanctions watchlist hit - automatic decline",
+    "application": {
+      "applicantId": "A009",
+      "fullName": "Ivan Borislav",
+      "ssnLast4": "1111",
+      "annualIncome": 90000,
+      "employmentYears": 5,
+      "requestedAmount": 20000,
+      "loanPurpose": "auto purchase",
+      "termMonths": 48,
+      "existingMonthlyDebt": 500,
+      "employer": "Initech",
+      "documents": ["id.pdf"]
+    },
+    "expectedDecision": "DECLINED"
+  },
+  {
+    "id": "GC-004",
+    "description": "Amount over unsecured policy cap - compliance breach, decline or manual review",
+    "application": {
+      "applicantId": "A003",
+      "fullName": "Priya Nair",
+      "ssnLast4": "7654",
+      "annualIncome": 130000,
+      "employmentYears": 6,
+      "requestedAmount": 150000,
+      "loanPurpose": "business investment",
+      "termMonths": 72,
+      "existingMonthlyDebt": 900,
+      "employer": "Umbrella LLC",
+      "documents": ["paystubs.pdf", "id.pdf", "tax-returns.pdf"]
+    },
+    "expectedDecision": "DECLINED"
+  }
+]

@@ -1,0 +1,68 @@
+[
+  {
+    "id": "INC-01", "description": "Low-risk staging plan uses simulated execution", "flow": "INCIDENT", "language": "en",
+    "input": {"field": "description", "text": "Connection pool exhausted with idle sessions."},
+    "stubResponses": {}, "failingAgents": [],
+    "expected": {"STATUS": "AUTO_REMEDIATED", "MODEL_CALLS": 3, "APPROVAL_COUNT": 0, "EXECUTION_COUNT": 1}, "knownGapActual": {}
+  },
+  {
+    "id": "INC-02", "description": "SEV1 cannot auto-execute even a low-risk plan", "flow": "INCIDENT", "language": "en",
+    "input": {"field": "description", "text": "The application is unavailable."},
+    "stubResponses": {"incident-triage": {"category": "APPLICATION", "severity": "SEV1", "sentiment": "CALM", "summary": "Synthetic outage", "rationale": "Critical impact"}}, "failingAgents": [],
+    "expected": {"STATUS": "ESCALATED", "MODEL_CALLS": 3, "APPROVAL_COUNT": 1, "EXECUTION_COUNT": 0}, "knownGapActual": {}
+  },
+  {
+    "id": "INC-03", "description": "SEV2 cannot auto-execute even a low-risk plan", "flow": "INCIDENT", "language": "en",
+    "input": {"field": "description", "text": "Service errors affect many requests."},
+    "stubResponses": {"incident-triage": {"category": "APPLICATION", "severity": "SEV2", "sentiment": "CALM", "summary": "Synthetic degradation", "rationale": "Major impact"}}, "failingAgents": [],
+    "expected": {"STATUS": "ESCALATED", "MODEL_CALLS": 3, "APPROVAL_COUNT": 1, "EXECUTION_COUNT": 0}, "knownGapActual": {}
+  },
+  {
+    "id": "INC-04", "description": "Security category always escalates", "flow": "INCIDENT", "language": "en",
+    "input": {"field": "description", "text": "Unusual authentication failures were detected."},
+    "stubResponses": {"incident-triage": {"category": "SECURITY", "severity": "SEV3", "sentiment": "CALM", "summary": "Synthetic security alert", "rationale": "Investigate access"}}, "failingAgents": [],
+    "expected": {"STATUS": "ESCALATED", "MODEL_CALLS": 3, "APPROVAL_COUNT": 1, "EXECUTION_COUNT": 0}, "knownGapActual": {}
+  },
+  {
+    "id": "INC-05", "description": "Diagnosis confidence 49 is below the policy floor", "flow": "INCIDENT", "language": "en",
+    "input": {"field": "description", "text": "Intermittent connection timeouts."},
+    "stubResponses": {"incident-diagnosis": {"probableCauses": ["Pool exhausted"], "evidence": ["Synthetic pool metrics"], "matchedRunbooks": ["RB-DB-001"], "confidencePct": 49}}, "failingAgents": [],
+    "expected": {"STATUS": "ESCALATED", "MODEL_CALLS": 3, "APPROVAL_COUNT": 1, "EXECUTION_COUNT": 0}, "knownGapActual": {}
+  },
+  {
+    "id": "INC-06", "description": "Confidence 50 permits simulation but fails the post-execution verification floor", "flow": "INCIDENT", "language": "en",
+    "input": {"field": "description", "text": "Idle sessions fill the database pool."},
+    "stubResponses": {"incident-diagnosis": {"probableCauses": ["Pool exhausted"], "evidence": ["Synthetic pool metrics"], "matchedRunbooks": ["RB-DB-001"], "confidencePct": 50}}, "failingAgents": [],
+    "expected": {"STATUS": "ESCALATED", "MODEL_CALLS": 3, "APPROVAL_COUNT": 1, "EXECUTION_COUNT": 1}, "knownGapActual": {}
+  },
+  {
+    "id": "INC-07", "description": "Tier-one production service requires human approval", "flow": "INCIDENT", "language": "en",
+    "input": {"field": "description", "text": "Idle sessions fill the gateway connection pool.", "service": "api-gateway", "environment": "production"},
+    "stubResponses": {}, "failingAgents": [],
+    "expected": {"STATUS": "PENDING_HUMAN_APPROVAL", "MODEL_CALLS": 3, "APPROVAL_COUNT": 1, "EXECUTION_COUNT": 0}, "knownGapActual": {}
+  },
+  {
+    "id": "INC-08", "description": "Catalog risk overrides a LOW model label on rollback", "flow": "INCIDENT", "language": "en",
+    "input": {"field": "description", "text": "Errors began after deployment."},
+    "stubResponses": {"incident-remediation": {"steps": [{"action": "rollback_deploy", "params": {"maxRevisions": "1"}, "riskLevel": "LOW", "requiresApproval": false}], "estimatedMinutes": 10, "rollbackPlan": "Review deployment"}}, "failingAgents": [],
+    "expected": {"STATUS": "PENDING_HUMAN_APPROVAL", "MODEL_CALLS": 3, "APPROVAL_COUNT": 1, "EXECUTION_COUNT": 0}, "knownGapActual": {}
+  },
+  {
+    "id": "INC-09", "description": "Triage outage escalates without later model calls", "flow": "INCIDENT", "language": "en",
+    "input": {"field": "description", "text": "Database pool is full."},
+    "stubResponses": {}, "failingAgents": ["incident-triage"],
+    "expected": {"STATUS": "ESCALATED", "MODEL_CALLS": 1, "APPROVAL_COUNT": 1, "EXECUTION_COUNT": 0}, "knownGapActual": {}
+  },
+  {
+    "id": "INC-10", "description": "Malformed remediation output fails safe after one schema-repair call", "flow": "INCIDENT", "language": "en",
+    "input": {"field": "description", "text": "Synthetic service timeout."},
+    "stubResponses": {"incident-remediation": "not valid JSON"}, "failingAgents": [],
+    "expected": {"STATUS": "ESCALATED", "MODEL_CALLS": 4, "APPROVAL_COUNT": 1, "EXECUTION_COUNT": 0}, "knownGapActual": {}
+  },
+  {
+    "id": "INC-11", "description": "Empty remediation plan cannot claim success", "flow": "INCIDENT", "language": "en",
+    "input": {"field": "description", "text": "Synthetic service timeout without a proposed action."},
+    "stubResponses": {"incident-remediation": {"steps": [], "estimatedMinutes": 0, "rollbackPlan": "None"}}, "failingAgents": [],
+    "expected": {"STATUS": "ESCALATED", "MODEL_CALLS": 3, "APPROVAL_COUNT": 1, "EXECUTION_COUNT": 0}, "knownGapActual": {}
+  }
+]

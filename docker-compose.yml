@@ -1,0 +1,41 @@
+# Local dev stack. Production deployment: see deploy/azure/
+services:
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      NVIDIA_API_KEY: ${NVIDIA_API_KEY}
+      # Durable event audit store (Postgres below):
+      SPRING_PROFILES_ACTIVE: ${APP_PROFILE:-default}
+      PLATFORM_PERSISTENCE: ${PLATFORM_PERSISTENCE:-memory}
+      PLATFORM_DB_URL: ${PLATFORM_DB_URL:-jdbc:postgresql://postgres:5432/agentic}
+      PLATFORM_DB_USER: ${PLATFORM_DB_USER:-agentic}
+      PLATFORM_DB_PASSWORD: ${PLATFORM_DB_PASSWORD:-agentic}
+      # Baseline API guard (empty = open demo mode):
+      PLATFORM_API_KEY: ${PLATFORM_API_KEY:-}
+      # Uncomment for Azure OpenAI instead of NIM:
+      # SPRING_PROFILES_ACTIVE: azure
+      # AZURE_OPENAI_ENDPOINT: ${AZURE_OPENAI_ENDPOINT}
+      # AZURE_OPENAI_API_KEY: ${AZURE_OPENAI_API_KEY}
+      MCP_ENABLED: "false"
+    depends_on:
+      postgres:
+        condition: service_started
+        required: false
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+
+  # Durable store for the platform event audit trail. Enable with:
+  #   PLATFORM_PERSISTENCE=jdbc docker compose up
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: agentic
+      POSTGRES_USER: agentic
+      POSTGRES_PASSWORD: agentic
+    ports:
+      - "5432:5432"

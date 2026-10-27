@@ -1,0 +1,11 @@
+{
+  "version": "release-gate-v1",
+  "minimumCases": {
+    "loan": 40,
+    "incident": 25,
+    "grievance": 40,
+    "document": 25,
+    "adversarial": 40
+  },
+  "minimumExactAccuracy": 1.0
+}
